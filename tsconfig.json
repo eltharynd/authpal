@@ -1,0 +1,11 @@
+{
+	"include": ["src/**/*.ts"],
+	"compilerOptions": {
+		"declaration": true,
+		"module": "commonjs",
+		"outDir": "lib",
+		"resolveJsonModule": true,
+		"rootDir": "src",
+		"target": "es2015"
+	}
+}
