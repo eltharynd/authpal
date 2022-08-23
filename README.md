@@ -47,6 +47,9 @@ app.post('/login', authpal.loginMiddleWare, (req, res) => {
 //verify headers have 'Bearer <accessToken>'
 app.get('/secure', authpal.authorizationMiddleware, (req, res) => {
   let user = req.user
+
+  //DO YOUR THINGS HERE
+
   res.sendStatus(200)
 })
 
