@@ -43,7 +43,7 @@ beforeAll((done) => {
       verifyPasswordCallback: (username, password) => {
         return password === global.user.password
       },
-      refreshTokenCallback: async (jwtPayload, token) => {
+      tokenRefreshedCallback: async (jwtPayload, token) => {
         global.user.token = token
       },
     }

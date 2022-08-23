@@ -4,6 +4,7 @@ import { Strategy as LocalStrategy } from 'passport-local'
 import { Strategy as JWTStrategy, ExtractJwt } from 'passport-jwt'
 import * as JWT from 'jsonwebtoken'
 import { v4 } from 'uuid'
+import * as cookie from 'cookie'
 
 import {
   AuthpalJWTPayload,
@@ -87,13 +88,25 @@ export class Authpal<T extends AuthpalJWTPayload = AuthpalJWTPayload> {
                   DEFAULT_EXPIRATION_TIME)
             ),
           }
-          await serverConfigs.refreshTokenCallback(jwtPayload, refreshToken)
-          res.header(
+          await serverConfigs.tokenRefreshedCallback(jwtPayload, refreshToken)
+
+          //res.setHeader('Access-Control-Expose-Headers', 'Set-Cookie')
+          res.setHeader(
             'Set-Cookie',
-            `refresh_token=${JWT.sign(
-              { token: refreshToken.token, userid: jwtPayload.userid },
-              serverConfigs.jwtSecret
-            )}; expiration: ${refreshToken.expiration.toUTCString()}; HttpOnly`
+            cookie.serialize(
+              'refresh_token',
+              JWT.sign(
+                { token: refreshToken.token, userid: jwtPayload.userid },
+                serverConfigs.jwtSecret
+              ),
+              {
+                httpOnly: true,
+                expires: refreshToken.expiration,
+                maxAge:
+                  serverConfigs.refreshTokenExpiration ||
+                  DEFAULT_EXPIRATION_TIME,
+              }
+            )
           )
           return res.json({
             accessToken: accessToken,
@@ -127,23 +140,39 @@ export class Authpal<T extends AuthpalJWTPayload = AuthpalJWTPayload> {
           jwtPayload &&
           jwtPayload.userid === (<AuthpalJWTPayload>decoded).userid
         ) {
+          let accessToken = JWT.sign(jwtPayload, serverConfigs.jwtSecret)
+
           let refreshToken = {
-            token: req.cookies.refresh_token,
+            token: decoded.token,
             expiration: new Date(
               Date.now() +
                 (serverConfigs.refreshTokenExpiration ||
                   DEFAULT_EXPIRATION_TIME)
             ),
           }
-          await serverConfigs.refreshTokenCallback(jwtPayload, refreshToken)
-          res.header(
+          await serverConfigs.tokenRefreshedCallback(jwtPayload, refreshToken)
+          //res.setHeader('Access-Control-Expose-Headers', 'Set-Cookie')
+          res.setHeader(
             'Set-Cookie',
-            `refresh_token=${JWT.sign(
-              { token: refreshToken.token, userid: jwtPayload.userid },
-              serverConfigs.jwtSecret
-            )}; expiration: ${refreshToken.expiration.toUTCString()}; HttpOnly`
+            cookie.serialize(
+              'refresh_token',
+              JWT.sign(
+                { token: refreshToken.token, userid: jwtPayload.userid },
+                serverConfigs.jwtSecret
+              ),
+              {
+                httpOnly: true,
+                expires: refreshToken.expiration,
+                maxAge:
+                  serverConfigs.refreshTokenExpiration ||
+                  DEFAULT_EXPIRATION_TIME,
+              }
+            )
           )
-          return next()
+          res.json({
+            accessToken: accessToken,
+          })
+          return
         }
       }
       res.sendStatus(401)

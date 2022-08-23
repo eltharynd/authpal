@@ -27,7 +27,7 @@ export interface AuthpalConfigs<
     username: string,
     password: string
   ): Promise<boolean> | boolean
-  refreshTokenCallback(
+  tokenRefreshedCallback(
     jwtPayload: TT,
     token: RefreshToken
   ): Promise<void> | void

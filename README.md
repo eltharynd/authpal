@@ -42,17 +42,15 @@ Create your routes using the prebuilt middlewares:
 //retrieve accessToken and set-cookie refreshToken
 app.post('/login', authpal.loginMiddleWare) //no need to setup response
 
+//generate a new accessToken via refreshToken cookie
+app.get('/resume', authpal.resumeMiddleware) //no need to setup response
+
 //verify headers have 'Bearer <accessToken>'
 app.get('/secure', authpal.authorizationMiddleware, (req, res) => {
   let user = req.user
 
   //DO YOUR THINGS HERE
 
-  res.sendStatus(200)
-})
-
-//generate a new accessToken via refreshToken cookie
-app.get('/resume', authpal.resumeMiddleware, (req, res) => {
   res.sendStatus(200)
 })
 ```
@@ -108,7 +106,7 @@ The configs type looks like this:
   A callback that returns the refresh token object as well as the associated User Payload.
   Use this to store the token in your database.
   */
-  refreshTokenCallback(
+  tokenRefreshedCallback(
     jwtPayload: AuthpalJWTPayload,
     token: RefreshToken
   ): Promise<void> | void
@@ -168,7 +166,7 @@ let authpal = new Authpal({
       userid: session.user,
     }
   },
-  refreshTokenCallback: async (jwtPayload, token) => {
+  tokenRefreshedCallback: async (jwtPayload, token) => {
     UsersModel.findOne({ _id: jwtPayload.userid }).then((user) => {
       //Delete or update existings ones to your discretion
       await SessionsModel.create({
