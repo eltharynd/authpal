@@ -16,7 +16,6 @@
   "author": "eltharynd",
   "license": "ISC",
   "dependencies": {
-    "cookie-parser": "^1.4.6",
     "jsonwebtoken": "^8.5.1",
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.0",
