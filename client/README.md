@@ -403,4 +403,7 @@ let authpalClient = new AuthpalClient({
 [s-npm-downloads-url]: https://npmcharts.com/compare/authpal?minimal=true
 [c-npm-version-image]: https://badgen.net/npm/v/authpal-client
 [c-npm-url]: https://npmjs.org/package/authpal-client
-[c-n
+[c-npm-install-size-image]: https://badgen.net/packagephobia/install/authpal-client
+[c-npm-install-size-url]: https://packagephobia.com/result?p=authpal-client
+[c-npm-downloads-image]: https://badgen.net/npm/dm/authpal-client
+[c-npm-downloads-url]: https://npmcharts.com/compare/authpal-client?minimal=true
