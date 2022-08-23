@@ -1,4 +1,4 @@
-import { AuthpalClientConfigs } from './interfaces'
+import { AuthpalClientConfigs, LibraryMisusageError } from './interfaces'
 import axios from 'axios'
 
 export class AuthpalClient {
@@ -54,7 +54,7 @@ export class AuthpalClient {
   private resumeAttemted = false
   async attemptResume(): Promise<void> {
     if (this.resumeAttemted) {
-      throw new Error(
+      throw new LibraryMisusageError(
         `You attempted to call resume but it's been already called.\n'attemptResume()' should only be called once at the start of your application or on page refresh.`
       )
     } else if (localStorage.APC_ATTEMPT_RESUME) {

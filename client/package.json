@@ -1,0 +1,29 @@
+{
+  "name": "authpal-client",
+  "version": "1.0.2",
+  "description": "An authentication and authorization library for express applications and clients",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "prepare": "rm -rf lib && tsc",
+    "deploy": "npm publish",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "files": [
+    "**/*.js",
+    "**/*.d.ts"
+  ],
+  "author": "eltharynd",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eltharynd/authpal"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.27.2",
+    "rxjs": "^7.5.6"
+  },
+  "devDependencies": {
+    "@types/axios": "^0.14.0"
+  }
+}

@@ -1,9 +1,8 @@
-.git
-.github
+**/.git
+**/.github
 **/.gitignore
-.prettierrc
+**/.prettierrc
 **/jasmine.json
 **/tsconfig.json
 **/src
 **/test
-client/

@@ -16,6 +16,8 @@ The latter is stored in cookies and the former should be stored in memory _(let 
 For quick setup follow [1️⃣](#1️⃣-setup) and [2️⃣](#2️⃣-configs-concretely).  
 Your greens 🥦 are pretty good to have but you don't necessarily have to read.
 
+For Client Side Usage refer to [Authpal-client](https://github.com/eltharynd/authpal/tree/main/client)
+
 </br>
 </br>
 </br>
@@ -231,7 +233,7 @@ let authpal = new Authpal({
 
 # Client Side Usage
 
-Coming soon...
+For Server Side Usage refer to [Authpal](https://github.com/eltharynd/authpal)
 
 [npm-downloads-image]: https://badgen.net/npm/dm/authpal
 [npm-downloads-url]: https://npmcharts.com/compare/authpal?minimal=true
