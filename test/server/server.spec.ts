@@ -1,100 +1,136 @@
+import * as express from 'express'
+import * as request from 'supertest'
+import * as finishTestcase from 'jasmine-supertest'
+
+import { Authpal, AuthpalJWTPayload } from '../../src'
+
 describe('Server', () => {
+  let app: express.Application
+  let authpal: Authpal
+
+  beforeAll(() => {
+    app = global.app
+    authpal = global.authpal
+
+    app.post('/login', authpal.loginMiddleWare, (req, res) => {
+      res.sendStatus(200)
+    })
+
+    app.get('/secure', authpal.authorizationMiddleware, (req, res) => {
+      //@ts-ignore
+      let user: AuthpalJWTPayload = req.user
+      res.sendStatus(200)
+    })
+
+    app.get('/resume', authpal.refreshMiddleware, (req, res) => {
+      res.sendStatus(200)
+    })
+  })
+
   it('should be initialized', () => {
-    expect(true).toBeTruthy()
+    expect(app).toBeDefined()
   })
 
-  it('should login user with valid credentials', () => {
-    expect(true).toBeTruthy()
+  it('should refuse login with invalid credentials', (done) => {
+    request(app).post('/login').expect(401).end(finishTestcase(done))
   })
 
-  it('should refuse login with invalid username', () => {
-    expect(true).toBeTruthy()
+  it('should login user with valid credentials', (done) => {
+    expect(2)
+    request(app)
+      .post('/login')
+      .send({ username: 'eltharynd', password: 'asupersecurepassword' })
+      .expect(200)
+      .end((err, res) => {
+        if (err) return done.fail(err)
+
+        let cookie = res.headers['set-cookie'][0]
+        expect(
+          /^refresh_token=.*; expiration: .{3}, \d\d .{3} \d\d\d\d \d\d:\d\d:\d\d GMT; HttpOnly$/.test(
+            cookie
+          )
+        ).toBeTrue()
+        expect(res.body.accessToken).toBeDefined()
+        done()
+      })
   })
 
-  it('should refuse login with invalid password', () => {
-    expect(true).toBeTruthy()
+  it('should allow access to secure route with credentials', (done) => {
+    request(app)
+      .post('/login')
+      .send({ username: 'eltharynd', password: 'asupersecurepassword' })
+      .expect(200)
+      .end((err, res) => {
+        if (err) return done.fail(err)
+
+        let accessToken = res.body.accessToken
+
+        request(app)
+          .get('/secure')
+          .set('Authorization', `Bearer ${accessToken}`)
+          .expect(200)
+          .end((e, r) => {
+            if (e) return done.fail(e)
+            done()
+          })
+      })
   })
 
-  it('should allow access to secure route with credentials', () => {
-    expect(true).toBeTruthy()
+  it('should deny access to secure route w/o credentials', (done) => {
+    request(app)
+      .get('/secure')
+      .expect(403)
+      .end((e, r) => {
+        if (e) return done.fail(e)
+        done()
+      })
   })
 
-  it('should deny access to secure route w/o credentials', () => {
-    expect(true).toBeTruthy()
+  it('should resume user login session', (done) => {
+    request(app)
+      .post('/login')
+      .send({ username: 'eltharynd', password: 'asupersecurepassword' })
+      .expect(200)
+      .end((err, res) => {
+        if (err) return done.fail(err)
+
+        let refreshToken = res.headers['set-cookie'][0]
+        global.resume = refreshToken
+          .replace(/^refresh_token=/, '')
+          .replace(/; .*$/, '')
+
+        request(app)
+          .get('/resume')
+          .set('Cookie', `${refreshToken}`)
+          .expect(200)
+          .end((e, r) => {
+            if (e) return done.fail(e)
+            done()
+          })
+      })
   })
 
-  it('should resume user login session', () => {
-    expect(true).toBeTruthy()
+  it('should deny user login session', (done) => {
+    request(app)
+      .post('/login')
+      .send({ username: 'eltharynd', password: 'asupersecurepassword' })
+      .expect(200)
+      .end((err, res) => {
+        if (err) return done.fail(err)
+
+        let refreshToken = res.headers['set-cookie'][0]
+        global.resume = refreshToken
+          .replace(/^refresh_token=/, '')
+          .replace(/; .*$/, '')
+
+        request(app)
+          .get('/resume')
+          .set('Cookie', `${refreshToken.replace(/token=.{3}/, 'token=124')}`)
+          .expect(401)
+          .end((e, r) => {
+            if (e) return done.fail(e)
+            done()
+          })
+      })
   })
 })
-
-//TODO implement unit testing
-/* 
-  let user = {
-    id: 12345,
-    username: 'eltharynd',
-    password: 'asupersecurepassword',
-    token: null,
-  }
-
-  let serverOptions: IServerOptions = {
-    jwtSecret: 'asupersecretjwtsecret',
-    usernameField: 'username',
-    passwordField: 'password',
-    findUserByUsernameCallback: (username) => {
-      if (username === user.username) {
-        return {
-          userid: 12345,
-        }
-      } else return null
-    },
-    findUserByIDCallback: (userid) => {
-      //@ts-ignore
-      if (userid == user.id)
-        return {
-          userid: 12345,
-        }
-      return null
-    },
-
-    findUserByRefreshToken: (token) => {
-      if (user.token.token === token) {
-        return {
-          userid: 12345,
-        }
-      } else return null
-    },
-
-    verifyPasswordCallback: (username, password) => {
-      return password === user.password
-    },
-    refreshTokenCallback: async (_token) => {
-      user.token = _token
-    },
-  }
-
-  let server = new Server(serverOptions)
-
-  let app = await express()
-  app.use(bodyParser.json())
-  app.use(cookieParser())
-  app.post('/login', server.loginMiddleWare, (req, res) => {
-    res.sendStatus(200)
-  })
-
-  app.get('/secure', server.authorizationMiddleware, (req, res) => {
-    //@ts-ignore
-    let user: IJWT = req.user
-    res.sendStatus(200)
-  })
-
-  app.get('/resume', server.refreshMiddleware, (req, res) => {
-    console.log('cookie outside', req.cookies)
-    res.sendStatus(200)
-  })
-
-  let _s = createServer(app)
-  _s.listen(3000, () => {
-    console.log('server started')
-  })
-*/

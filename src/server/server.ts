@@ -6,33 +6,32 @@ import * as JWT from 'jsonwebtoken'
 import { v4 } from 'uuid'
 
 import {
-  IRefreshToken,
-  IJWTPayload,
-  IServerOptions,
+  AuthpalJWTPayload,
+  AuthpalConfigs,
   DEFAULT_EXPIRATION_TIME,
 } from './interfaces'
 
-export class Server {
-  private serverOptions: IServerOptions
+export class Authpal<T extends AuthpalJWTPayload = AuthpalJWTPayload> {
+  private serverConfigs: AuthpalConfigs
 
-  constructor(serverOptions: IServerOptions) {
-    this.serverOptions = serverOptions
+  constructor(serverConfigs: AuthpalConfigs) {
+    this.serverConfigs = serverConfigs
 
     passport.use(
       'login',
       new LocalStrategy(
         {
-          usernameField: this.serverOptions.usernameField,
-          passwordField: this.serverOptions.passwordField,
+          usernameField: this.serverConfigs.usernameField || 'username',
+          passwordField: this.serverConfigs.passwordField || 'password',
         },
         async function (username, password, done) {
           try {
-            let user = await serverOptions.findUserByUsernameCallback(username)
+            let user = await serverConfigs.findUserByUsernameCallback(username)
             if (!user)
               return done(null, false, { message: 'Invalid credentials' })
 
             if (
-              !(await serverOptions.verifyPasswordCallback(username, password))
+              !(await serverConfigs.verifyPasswordCallback(username, password))
             )
               return done(null, false, { message: 'Invalid credentials' })
 
@@ -48,11 +47,11 @@ export class Server {
       new JWTStrategy(
         {
           jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-          secretOrKey: serverOptions.jwtSecret,
+          secretOrKey: serverConfigs.jwtSecret,
         },
         async function (jwtPayload, done) {
           try {
-            let user = await serverOptions.findUserByIDCallback(
+            let user = await serverConfigs.findUserByIDCallback(
               jwtPayload.userid
             )
             if (user) done(null, user)
@@ -68,41 +67,38 @@ export class Server {
   }
 
   private prepareMiddlewares() {
-    let serverOptions = this.serverOptions
+    let serverConfigs = this.serverConfigs
     this.loginMiddleWare = (
       req: Request,
       res: Response,
       next: NextFunction
     ) => {
-      passport.authenticate(
-        'login',
-        async function (err, jwtPayload: IJWTPayload) {
-          if (err) return next(err)
-          if (!jwtPayload) return res.sendStatus(401)
-          req.login(jwtPayload, { session: false }, async function (error) {
-            if (error) return next(error)
-            let accessToken = JWT.sign(jwtPayload, serverOptions.jwtSecret)
-            let refreshToken = {
-              token: v4(),
-              expiration: new Date(
-                Date.now() +
-                  (serverOptions.refreshTokenExpiration ||
-                    DEFAULT_EXPIRATION_TIME)
-              ),
-            }
-            await serverOptions.refreshTokenCallback(jwtPayload, refreshToken)
-            res.header(
-              'Set-Cookie',
-              `refresh_token=${
-                refreshToken.token
-              }; expiration: ${refreshToken.expiration.toUTCString()}; HttpOnly`
-            )
-            return res.json({
-              accessToken: accessToken,
-            })
+      passport.authenticate('login', async function (err, jwtPayload: T) {
+        if (err) return next(err)
+        if (!jwtPayload) return res.sendStatus(401)
+        req.login(jwtPayload, { session: false }, async function (error) {
+          if (error) return next(error)
+          let accessToken = JWT.sign(jwtPayload, serverConfigs.jwtSecret)
+          let refreshToken = {
+            token: v4(),
+            expiration: new Date(
+              Date.now() +
+                (serverConfigs.refreshTokenExpiration ||
+                  DEFAULT_EXPIRATION_TIME)
+            ),
+          }
+          await serverConfigs.refreshTokenCallback(jwtPayload, refreshToken)
+          res.header(
+            'Set-Cookie',
+            `refresh_token=${
+              refreshToken.token
+            }; expiration: ${refreshToken.expiration.toUTCString()}; HttpOnly`
+          )
+          return res.json({
+            accessToken: accessToken,
           })
-        }
-      )(req, res, next)
+        })
+      })(req, res, next)
     }
 
     this.refreshMiddleware = async (
@@ -111,7 +107,7 @@ export class Server {
       next: NextFunction
     ) => {
       if (req.cookies.refresh_token) {
-        let jwtPayload = await serverOptions.findUserByRefreshToken(
+        let jwtPayload = await serverConfigs.findUserByRefreshToken(
           req.cookies.refresh_token
         )
         if (jwtPayload) {
@@ -119,18 +115,18 @@ export class Server {
             token: req.cookies.refresh_token,
             expiration: new Date(
               Date.now() +
-                (serverOptions.refreshTokenExpiration ||
+                (serverConfigs.refreshTokenExpiration ||
                   DEFAULT_EXPIRATION_TIME)
             ),
           }
-          await serverOptions.refreshTokenCallback(jwtPayload, refreshToken)
+          await serverConfigs.refreshTokenCallback(jwtPayload, refreshToken)
           res.header(
             'Set-Cookie',
             `refresh_token=${
               refreshToken.token
             }; expiration: ${refreshToken.expiration.toUTCString()}; HttpOnly`
           )
-          next()
+          return next()
         }
       }
       res.sendStatus(401)
