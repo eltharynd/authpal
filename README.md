@@ -51,7 +51,7 @@ app.get('/secure', authpal.authorizationMiddleware, (req, res) => {
 })
 
 //generate a new accessToken via refreshToken cookie
-app.get('/resume', authpal.refreshMiddleware, (req, res) => {
+app.get('/resume', authpal.resumeMiddleware, (req, res) => {
   res.sendStatus(200)
 })
 ```
