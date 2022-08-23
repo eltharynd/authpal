@@ -1,17 +1,28 @@
-# authie
+# Authpal
 
 A node package to handle user authentication and authorization securely on both client and server.
 
 **Built on top of express, passport and jwt.**
 
-For quick setup follow 1️⃣ and 2️⃣.  
+Its goal is to be simple to use yet up to security standards. And be reusable across different apps so you don't have to rewrite the same thing every time you build a web app.
+
+It uses the a**ccessToken & refreshToken** combo.
+The latter is stored in cookies and the former should be stored in memory _(let accessToken, not localStorage.accessToken)_.
+
+For quick setup follow [1️⃣](#1️⃣-setup) and [2️⃣](#2️⃣-configs-concretely).  
 Your greens 🥦 are pretty good to have but you don't necessarily have to read.
 
-# Server Side
+# Server Side Setup
 
 ## 1️⃣ Setup
 
-Import the packate and istantiate it:
+Install the package:
+
+```bash
+npm install authpal
+```
+
+Import the package and istantiate it:
 
 ```typescript
 import { Authpal } from 'authpal'
