@@ -12,9 +12,15 @@ The latter is stored in cookies and the former should be stored in memory _(let 
 For quick setup follow [1️⃣](#1️⃣-setup) and [2️⃣](#2️⃣-configs-concretely).  
 Your greens 🥦 are pretty good to have but you don't necessarily have to read.
 
-# Server Side Setup
+</br>
+</br>
+</br>
+
+# Server Side Usage
 
 ## 1️⃣ Setup
+
+</br>
 
 Install the package:
 
@@ -55,7 +61,17 @@ app.get('/secure', authpal.authorizationMiddleware, (req, res) => {
 })
 ```
 
+</br>
+
 ## 🥦 Configs
+
+<details>
+
+<summary>The following section describes the config object. Click to expand.</summary>
+
+---
+
+<br/>
 
 The way the interface is setup requires you to define callbacks to:
 
@@ -113,7 +129,21 @@ The configs type looks like this:
 }
 ```
 
+</details>
+
+</br>
+
+</br>
+
 ## 🥦 Understand the User Payload (AuthpalJWTPayload)
+
+<details>
+
+<summary>The following section describes the Payload object. Click to expand. </summary>
+
+---
+
+<br/>
 
 `AuthpalJWTPayload` is defined as
 
@@ -145,7 +175,13 @@ app.get('/secure', authpal.authorizationMiddleware, (req, res) => {
 })
 ```
 
+</details>
+
+</br>
+
 ## 2️⃣ Configs (concretely)
+
+</br>
 
 If you skipped the previous two paragraphs, it doesn't really matter, all you need to know is that you need to setup at least the basic configs in a similar fashion
 
@@ -185,6 +221,10 @@ let authpal = new Authpal({
 })
 ```
 
-# Client Side
+</br>
+</br>
+</br>
+
+# Client Side Usage
 
 Coming soon...
