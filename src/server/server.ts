@@ -90,9 +90,10 @@ export class Authpal<T extends AuthpalJWTPayload = AuthpalJWTPayload> {
           await serverConfigs.refreshTokenCallback(jwtPayload, refreshToken)
           res.header(
             'Set-Cookie',
-            `refresh_token=${
-              refreshToken.token
-            }; expiration: ${refreshToken.expiration.toUTCString()}; HttpOnly`
+            `refresh_token=${JWT.sign(
+              { token: refreshToken.token, userid: jwtPayload.userid },
+              serverConfigs.jwtSecret
+            )}; expiration: ${refreshToken.expiration.toUTCString()}; HttpOnly`
           )
           return res.json({
             accessToken: accessToken,
@@ -107,10 +108,25 @@ export class Authpal<T extends AuthpalJWTPayload = AuthpalJWTPayload> {
       next: NextFunction
     ) => {
       if (req.cookies.refresh_token) {
+        let decoded
+        try {
+          decoded = JWT.verify(
+            req.cookies.refresh_token,
+            serverConfigs.jwtSecret
+          )
+          if (!decoded) throw new Error(`Couldn't decode payload`)
+        } catch (e) {
+          res.sendStatus(401)
+          return
+        }
+
         let jwtPayload = await serverConfigs.findUserByRefreshToken(
-          req.cookies.refresh_token
+          decoded.token
         )
-        if (jwtPayload) {
+        if (
+          jwtPayload &&
+          jwtPayload.userid === (<AuthpalJWTPayload>decoded).userid
+        ) {
           let refreshToken = {
             token: req.cookies.refresh_token,
             expiration: new Date(
@@ -122,9 +138,10 @@ export class Authpal<T extends AuthpalJWTPayload = AuthpalJWTPayload> {
           await serverConfigs.refreshTokenCallback(jwtPayload, refreshToken)
           res.header(
             'Set-Cookie',
-            `refresh_token=${
-              refreshToken.token
-            }; expiration: ${refreshToken.expiration.toUTCString()}; HttpOnly`
+            `refresh_token=${JWT.sign(
+              { token: refreshToken.token, userid: jwtPayload.userid },
+              serverConfigs.jwtSecret
+            )}; expiration: ${refreshToken.expiration.toUTCString()}; HttpOnly`
           )
           return next()
         }

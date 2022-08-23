@@ -1,7 +1,7 @@
 {
   "name": "authpal",
-  "version": "1.0.0",
-  "description": "a npm package template",
+  "version": "1.0.1",
+  "description": "An authentication and authorization library for express applications and clients",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {

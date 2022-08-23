@@ -1,6 +1,7 @@
 import * as express from 'express'
 import * as request from 'supertest'
 import * as finishTestcase from 'jasmine-supertest'
+import * as JWT from 'jsonwebtoken'
 
 import { Authpal, AuthpalJWTPayload } from '../../src'
 
@@ -95,9 +96,14 @@ describe('Server', () => {
         if (err) return done.fail(err)
 
         let refreshToken = res.headers['set-cookie'][0]
-        global.resume = refreshToken
-          .replace(/^refresh_token=/, '')
-          .replace(/; .*$/, '')
+
+        let decoded = JWT.verify(
+          refreshToken.replace(/^refresh_token=/, '').replace(/; .*$/, ''),
+          global.authpalConfigs.jwtSecret
+        )
+
+        //@ts-ignore
+        global.resume = decoded.token
 
         request(app)
           .get('/resume')

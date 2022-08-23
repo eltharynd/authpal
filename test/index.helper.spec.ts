@@ -47,6 +47,7 @@ beforeAll((done) => {
         global.user.token = token
       },
     }
+    global.authpalConfigs = authpalConfigs
     global.authpal = new Authpal(authpalConfigs)
 
     let app: express.Application = express()
