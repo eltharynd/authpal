@@ -23,7 +23,7 @@ describe('Server', () => {
       res.sendStatus(200)
     })
 
-    app.get('/resume', authpal.refreshMiddleware, (req, res) => {
+    app.get('/resume', authpal.resumeMiddleware, (req, res) => {
       res.sendStatus(200)
     })
   })

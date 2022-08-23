@@ -102,7 +102,7 @@ export class Authpal<T extends AuthpalJWTPayload = AuthpalJWTPayload> {
       })(req, res, next)
     }
 
-    this.refreshMiddleware = async (
+    this.resumeMiddleware = async (
       req: Request,
       res: Response,
       next: NextFunction
@@ -170,7 +170,7 @@ export class Authpal<T extends AuthpalJWTPayload = AuthpalJWTPayload> {
 
   loginMiddleWare = (req: Request, res: Response, next: NextFunction) => {}
 
-  refreshMiddleware = async (
+  resumeMiddleware = async (
     req: Request,
     res: Response,
     next: NextFunction
