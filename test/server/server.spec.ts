@@ -13,17 +13,13 @@ describe('Server', () => {
     app = global.app
     authpal = global.authpal
 
-    app.post('/login', authpal.loginMiddleWare, (req, res) => {
-      res.sendStatus(200)
-    })
+    app.post('/login', authpal.loginMiddleWare)
+
+    app.get('/resume', authpal.resumeMiddleware)
 
     app.get('/secure', authpal.authorizationMiddleware, (req, res) => {
       //@ts-ignore
       let user: AuthpalJWTPayload = req.user
-      res.sendStatus(200)
-    })
-
-    app.get('/resume', authpal.resumeMiddleware, (req, res) => {
       res.sendStatus(200)
     })
   })
@@ -46,11 +42,7 @@ describe('Server', () => {
         if (err) return done.fail(err)
 
         let cookie = res.headers['set-cookie'][0]
-        expect(
-          /^refresh_token=.*; expiration: .{3}, \d\d .{3} \d\d\d\d \d\d:\d\d:\d\d GMT; HttpOnly$/.test(
-            cookie
-          )
-        ).toBeTrue()
+        expect(/^refresh_token=.*; .*; HttpOnly$/.test(cookie)).toBeTrue()
         expect(res.body.accessToken).toBeDefined()
         done()
       })
