@@ -6,7 +6,7 @@ A node package to handle user authentication and authorization securely on both 
 
 Its goal is to be simple to use yet up to security standards. And be reusable across different apps so you don't have to rewrite the same thing every time you build a web app.
 
-It uses the a**ccessToken & refreshToken** combo.
+It uses the **accessToken & refreshToken** combo.
 The latter is stored in cookies and the former should be stored in memory _(let accessToken, not localStorage.accessToken)_.
 
 For quick setup follow [1️⃣](#1️⃣-setup) and [2️⃣](#2️⃣-configs-concretely).  
