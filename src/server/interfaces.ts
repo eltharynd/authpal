@@ -3,7 +3,6 @@ export interface RefreshToken {
   expiration: Date
 }
 
-//TODO make public and extendable so users can save more data in jwt paylod if they want to
 export interface AuthpalJWTPayload {
   userid?: string | number
 }

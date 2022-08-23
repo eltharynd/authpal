@@ -178,7 +178,6 @@ export class Authpal<T extends AuthpalJWTPayload = AuthpalJWTPayload> {
       res.sendStatus(401)
     }
 
-    //TODO verify if it shouldn't be passport.authorizate() instead
     this.authorizationMiddleware = (
       req: Request,
       res: Response,
@@ -193,8 +192,6 @@ export class Authpal<T extends AuthpalJWTPayload = AuthpalJWTPayload> {
         }
       })(req, res, next)
     }
-
-    //TODO last middleware that doesn't automatically return 403
   }
 
   loginMiddleWare = (req: Request, res: Response, next: NextFunction) => {}

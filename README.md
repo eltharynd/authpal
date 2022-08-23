@@ -1,5 +1,9 @@
 # Authpal
 
+[![NPM Version][npm-version-image]][npm-url]
+[![NPM Install Size][npm-install-size-image]][npm-install-size-url]
+[![NPM Downloads][npm-downloads-image]][npm-downloads-url]
+
 A node package to handle user authentication and authorization securely on both client and server.
 
 **Built on top of express, passport and jwt.**
@@ -228,3 +232,10 @@ let authpal = new Authpal({
 # Client Side Usage
 
 Coming soon...
+
+[npm-downloads-image]: https://badgen.net/npm/dm/authpal
+[npm-downloads-url]: https://npmcharts.com/compare/authpal?minimal=true
+[npm-install-size-image]: https://badgen.net/packagephobia/install/authpal
+[npm-install-size-url]: https://packagephobia.com/result?p=authpal
+[npm-url]: https://npmjs.org/package/authpal
+[npm-version-image]: https://badgen.net/npm/v/authpal
