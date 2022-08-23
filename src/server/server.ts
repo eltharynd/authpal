@@ -107,7 +107,7 @@ export class Authpal<T extends AuthpalJWTPayload = AuthpalJWTPayload> {
       res: Response,
       next: NextFunction
     ) => {
-      if (req.cookies.refresh_token) {
+      if (req.cookies?.refresh_token) {
         let decoded
         try {
           decoded = JWT.verify(
