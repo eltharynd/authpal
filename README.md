@@ -40,9 +40,7 @@ Create your routes using the prebuilt middlewares:
 
 ```typescript
 //retrieve accessToken and set-cookie refreshToken
-app.post('/login', authpal.loginMiddleWare, (req, res) => {
-  res.sendStatus(200)
-})
+app.post('/login', authpal.loginMiddleWare) //no need to setup response
 
 //verify headers have 'Bearer <accessToken>'
 app.get('/secure', authpal.authorizationMiddleware, (req, res) => {
