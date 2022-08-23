@@ -351,6 +351,19 @@ axios
   })
 ```
 
+Whenever you receive a userChangesEvent it's defined like so:
+
+```typescript
+/*
+  The changes fired in your
+  userChangesEmitter.subscribe((changes) => {})
+*/
+{
+  type: string //this can be 'login', 'resume' or 'logout'
+  authenticated: boolean //is user authenticated after this event?
+}
+```
+
 ## 4️⃣ Configs
 
 The AuthpalClientConfigs object is defined this way:

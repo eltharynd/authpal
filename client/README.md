@@ -1,8 +1,18 @@
 # Authpal
 
-[![NPM Version][npm-version-image]][npm-url]
-[![NPM Install Size][npm-install-size-image]][npm-install-size-url]
-[![NPM Downloads][npm-downloads-image]][npm-downloads-url]
+authpal
+
+[![NPM Version][s-npm-version-image]][s-npm-url]
+[![NPM Install Size][s-npm-install-size-image]][s-npm-install-size-url]
+[![NPM Downloads][s-npm-downloads-image]][s-npm-downloads-url]
+
+authpal-client
+
+[![NPM Version][c-npm-version-image]][c-npm-url]
+[![NPM Install Size][c-npm-install-size-image]][c-npm-install-size-url]
+[![NPM Downloads][c-npm-downloads-image]][c-npm-downloads-url]
+
+<br/>
 
 A node package to handle user authentication and authorization securely on both client and server.
 
@@ -13,12 +23,15 @@ Its goal is to be simple to use yet up to security standards. And be reusable ac
 It uses the **accessToken & refreshToken** combo.
 The latter is stored in cookies and the former should be stored in memory _(let accessToken, not localStorage.accessToken)_.
 
+## Server
+
 For quick setup follow [1️⃣](#1️⃣-setup) and [2️⃣](#2️⃣-configs-concretely).  
 Your greens 🥦 are pretty good to have but you don't necessarily have to read.
 
-For Client Side Usage refer to [Authpal-client](https://github.com/eltharynd/authpal/tree/main/client)
+## Client
 
-</br>
+Setup your project following [3️⃣](#3️⃣-setup) then [4️⃣](#4️⃣-configs) explains the configuration for the client side better.
+
 </br>
 </br>
 
@@ -233,11 +246,161 @@ let authpal = new Authpal({
 
 # Client Side Usage
 
-For Server Side Usage refer to [Authpal](https://github.com/eltharynd/authpal)
+## 3️⃣ Setup
 
-[npm-downloads-image]: https://badgen.net/npm/dm/authpal
-[npm-downloads-url]: https://npmcharts.com/compare/authpal?minimal=true
-[npm-install-size-image]: https://badgen.net/packagephobia/install/authpal
-[npm-install-size-url]: https://packagephobia.com/result?p=authpal
-[npm-url]: https://npmjs.org/package/authpal
-[npm-version-image]: https://badgen.net/npm/v/authpal
+</br>
+
+Install the package:
+
+```bash
+npm install authpal-client
+```
+
+Import the package and istantiate it:
+
+```typescript
+import { AuthpalClient } from 'authpal'
+
+//...
+
+let authpalClient = new AuthpalClient({
+  //AuthpalClientConfigs are mandatory, read the 'Configs' paragraph below
+})
+
+//...
+```
+
+Here's how to use the library
+
+```typescript
+/*
+  RESUME SESSION
+
+  As soon as your application start attempt to resume to revalidate the refresh cookie.
+  If it exists and the server validates it will receive a new access token and be logged in again.
+*/
+authpalClient.attemptResume()
+
+/*
+  LOGIN
+
+  This method takes a credentials object as a parameter.
+  These have to match what you selected on the server side as overrides.
+  You you didn't change anything they'll be 'username' and 'password'.
+*/
+authpalClient.login({
+  username: 'myusername',
+  password: 'asupersecretpassword',
+})
+
+/*
+  LOGOUT
+*/
+authpalClient.logout()
+```
+
+All of these methods are async Promises and can be awaited for.
+
+The best method to catch the events is through the emitter that you can pass via the ClientConfigs:
+
+```typescript
+userChangesEmitter.subscribe((changes) => {
+  //This fires with every event and change in login status.
+})
+
+/*
+    resomeDoneEmitter is a Subject<void> (from 'rxjs').
+    This is marked as .complete() whenever the attemptResume() is done.
+
+    This is particulary useful when you need to wait until the resume 
+    process is over before doing other things like rendering or requesting data
+  */
+await resumeDoneEmitter.toPromise() //Will only continue when is alredy or gets completed
+
+/*
+    Sometimes you wanna do more stuff before the resume process is over.
+    You can provide a middleware function that gets fired right before completing succcessfully.
+  */
+{
+  //... your client configs
+  resumeDoneMiddleware: async () => {
+    //User requests are now authenticated
+    //Do whatever you need to do (ask for user data or ...)
+  }
+}
+```
+
+Once you're authenticated, you can pass the authorization token to your request library of choice like so:
+
+```typescript
+//This example is with axios but it should work with any library
+
+axios
+  .get({
+    method: 'get',
+    url: 'https://example.com/api/v1/secure/private/get-out/please-no',
+    headers: {
+      //Your other custom headers go here
+
+      //Add Auth headers to the others
+      ...this.authPalClient.getAuthorizationHeader(),
+    },
+  })
+  .then(({ data }) => {
+    console.log(data)
+  })
+```
+
+Whenever you receive a userChangesEvent it's defined like so:
+
+```typescript
+/*
+  The changes fired in your
+  userChangesEmitter.subscribe((changes) => {})
+*/
+{
+  type: string //this can be 'login', 'resume' or 'logout'
+  authenticated: boolean //is user authenticated after this event?
+}
+```
+
+## 4️⃣ Configs
+
+The AuthpalClientConfigs object is defined this way:
+
+```typescript
+/*
+  You wanna keep an outside reference to these so you can subscribe 
+  and listen to events, or await for the resume process to be done
+*/
+let userChangesEmitter = new UserChangesEmitter()
+let resumeDoneEmitter = new Subject()
+
+let authpalClient = new AuthpalClient({
+  //The POST endpoint for logging in on your server
+  loginPostUrl: 'https://example.com/api/v1/login',
+  //The GET endpoint for resuming the session in on your server
+  loginPostUrl: 'https://example.com/api/v1/login',
+
+  //The custom subject that emits changes to the user (As defined above)
+  userChangesEmitter: userChangesEmitter,
+
+  //A Subject<void> that gets completed when the resume attempt is over (See 3️⃣)
+  resumeDoneEmitter: resumeDoneEmitter,
+
+  //(optional) A middleware callback to call right before a resume request succeeds
+  resumeDoneMiddleware: async () => {
+    //Do your things... You're already authenticated at this point
+  },
+})
+```
+
+[s-npm-version-image]: https://badgen.net/npm/v/authpal
+[s-npm-url]: https://npmjs.org/package/authpal
+[s-npm-install-size-image]: https://badgen.net/packagephobia/install/authpal
+[s-npm-install-size-url]: https://packagephobia.com/result?p=authpal
+[s-npm-downloads-image]: https://badgen.net/npm/dm/authpal
+[s-npm-downloads-url]: https://npmcharts.com/compare/authpal?minimal=true
+[c-npm-version-image]: https://badgen.net/npm/v/authpal-client
+[c-npm-url]: https://npmjs.org/package/authpal-client
+[c-n
