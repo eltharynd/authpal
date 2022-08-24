@@ -78,23 +78,25 @@ export class AuthpalClient {
     })
       .then(async ({ data }) => {
         this.accessToken = data.accessToken
-        this.clientConfigs.userChangesEmitter.next({
+        let changes = {
           type: 'resume',
           authenticated: true,
-        })
+        }
+        this.clientConfigs.userChangesEmitter.next(changes)
         if (this.clientConfigs.resumeDoneMiddleware) {
-          await this.clientConfigs.resumeDoneMiddleware()
+          await this.clientConfigs.resumeDoneMiddleware(changes)
         }
         this.clientConfigs.resumeDoneEmitter.complete()
       })
       .catch(async (error) => {
         if (error?.response?.status === 401) {
-          await this.clientConfigs.userChangesEmitter.next({
+          let changes = {
             type: 'resume',
             authenticated: false,
-          })
+          }
+          await this.clientConfigs.userChangesEmitter.next(changes)
           if (this.clientConfigs.resumeDoneMiddleware) {
-            await this.clientConfigs.resumeDoneMiddleware()
+            await this.clientConfigs.resumeDoneMiddleware(changes)
           }
           this.clientConfigs.resumeDoneEmitter.complete()
         } else console.error(error)

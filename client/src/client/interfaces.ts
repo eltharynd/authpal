@@ -6,7 +6,7 @@ type UserChangesEvent = { type: string; authenticated: boolean }
 export interface AuthpalClientConfigs {
   userChangesEmitter: UserChangesEmitter
   resumeDoneEmitter: Subject<void>
-  resumeDoneMiddleware?(): Promise<void>
+  resumeDoneMiddleware?(changes?: UserChangesEvent): Promise<void>
 
   loginPostURL: string
   resumeGetURL: string
