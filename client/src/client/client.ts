@@ -61,7 +61,10 @@ export class AuthpalClient {
       this.resume()
     } else {
       if (this.clientConfigs.resumeDoneMiddleware) {
-        await this.clientConfigs.resumeDoneMiddleware()
+        await this.clientConfigs.resumeDoneMiddleware({
+          type: 'resume',
+          authenticated: false,
+        })
       }
       this.clientConfigs.resumeDoneEmitter.complete()
     }
