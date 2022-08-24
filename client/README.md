@@ -323,7 +323,7 @@ await resumeDoneEmitter.toPromise() //Will only continue when is alredy or gets 
   */
 {
   //... your client configs
-  resumeDoneMiddleware: async () => {
+  resumeDoneMiddleware: async (changes) => {
     //User requests are now authenticated
     //Do whatever you need to do (ask for user data or ...)
   }
@@ -389,7 +389,7 @@ let authpalClient = new AuthpalClient({
   resumeDoneEmitter: resumeDoneEmitter,
 
   //(optional) A middleware callback to call right before a resume request succeeds
-  resumeDoneMiddleware: async () => {
+  resumeDoneMiddleware: async (changes) => {
     //Do your things... You're already authenticated at this point
   },
 })
