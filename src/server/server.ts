@@ -129,6 +129,14 @@ export class Authpal<T extends AuthpalJWTPayload = AuthpalJWTPayload> {
           )
           if (!decoded) throw new Error(`Couldn't decode payload`)
         } catch (e) {
+          res.setHeader(
+            'Set-Cookie',
+            cookie.serialize('refresh_token', 'deleted', {
+              httpOnly: true,
+              expires: new Date(),
+              maxAge: 0,
+            })
+          )
           res.sendStatus(401)
           return
         }
@@ -173,6 +181,15 @@ export class Authpal<T extends AuthpalJWTPayload = AuthpalJWTPayload> {
             accessToken: accessToken,
           })
           return
+        } else {
+          res.setHeader(
+            'Set-Cookie',
+            cookie.serialize('refresh_token', 'deleted', {
+              httpOnly: true,
+              expires: new Date(),
+              maxAge: 0,
+            })
+          )
         }
       }
       res.sendStatus(401)
