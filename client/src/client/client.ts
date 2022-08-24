@@ -76,6 +76,7 @@ export class AuthpalClient {
       url: `${this.clientConfigs.resumeGetURL}`,
       headers: {
         'Access-Control-Expose-Headers': 'Set-Cookie',
+        ...this.getAuthorizationHeader,
       },
       withCredentials: true,
     })
