@@ -10,7 +10,7 @@ export class AuthpalClient {
     this.clientConfigs.userChangesEmitter.subscribe((changes) => {
       if (!changes.authenticated) {
         this.accessToken = null
-        localStorage.APC_ATTEMPT_RESUME = false
+        delete localStorage.APC_ATTEMPT_RESUME
       } else {
         localStorage.APC_ATTEMPT_RESUME = true
       }
@@ -57,7 +57,7 @@ export class AuthpalClient {
       throw new LibraryMisusageError(
         `You attempted to call resume but it's been already called.\n'attemptResume()' should only be called once at the start of your application or on page refresh.`
       )
-    } else if (localStorage.APC_ATTEMPT_RESUME) {
+    } else if (localStorage.APC_ATTEMPT_RESUME === 'true') {
       this.resume()
     } else {
       if (this.clientConfigs.resumeDoneMiddleware) {
@@ -76,7 +76,6 @@ export class AuthpalClient {
       url: `${this.clientConfigs.resumeGetURL}`,
       headers: {
         'Access-Control-Expose-Headers': 'Set-Cookie',
-        ...this.getAuthorizationHeader,
       },
       withCredentials: true,
     })
@@ -113,6 +112,7 @@ export class AuthpalClient {
       url: `${this.clientConfigs.logoutGetURL}`,
       headers: {
         'Access-Control-Expose-Headers': 'Set-Cookie',
+        Authorization: `Bearer ${this.accessToken}`,
       },
       withCredentials: true,
     }).then(() => {
