@@ -102,6 +102,8 @@ export class Authpal<T extends AuthpalJWTPayload = AuthpalJWTPayload> {
               {
                 httpOnly: true,
                 expires: refreshToken.expiration,
+                sameSite: 'none',
+                secure: true,
                 maxAge:
                   serverConfigs.refreshTokenExpiration ||
                   DEFAULT_EXPIRATION_TIME,
@@ -253,6 +255,8 @@ export class Authpal<T extends AuthpalJWTPayload = AuthpalJWTPayload> {
                 'Set-Cookie',
                 cookie.serialize('refresh_token', 'deleted', {
                   httpOnly: true,
+                  sameSite: 'none',
+                  secure: true,
                   expires: new Date(),
                   maxAge: 0,
                 })
