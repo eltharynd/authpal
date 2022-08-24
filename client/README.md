@@ -145,6 +145,15 @@ The configs type looks like this:
     jwtPayload: AuthpalJWTPayload,
     token: RefreshToken
   ): Promise<void> | void
+
+  /*
+  A callback that returns the refresh token object as well as the associated User Payload.
+  Use this to delete the token from your database when user logs out.
+  */
+  tokenDeletedCallback(
+    jwtPayload: AuthpalJWTPayload,
+    token: RefreshToken
+  ): Promise<void> | void
 }
 ```
 
@@ -223,11 +232,20 @@ let authpal = new Authpal({
   },
   tokenRefreshedCallback: async (jwtPayload, token) => {
     UsersModel.findOne({ _id: jwtPayload.userid }).then((user) => {
-      //Delete or update existings ones to your discretion
+      //Delete existing or update them to your discretion
       await SessionsModel.create({
         user: jwtPayload.userid,
         token: token.token,
         expiration: token.expiration,
+      })
+    })
+  },
+  tokenDeletedCallback: async (jwtPayload, token) => {
+    UsersModel.findOne({ _id: jwtPayload.userid }).then((user) => {
+      //Delete the token on logout
+      await SessionsModel.deleteMany({
+        user: jwtPayload.userid,
+        token: token.token,
       })
     })
   },

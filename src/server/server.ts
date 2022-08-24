@@ -192,6 +192,57 @@ export class Authpal<T extends AuthpalJWTPayload = AuthpalJWTPayload> {
         }
       })(req, res, next)
     }
+
+    this.logoutMiddleware = async (
+      req: Request,
+      res: Response,
+      next: NextFunction
+    ) => {
+      passport.authenticate(
+        'jwt',
+        { session: false },
+        async (err, jwtPayload) => {
+          if (err || !jwtPayload) {
+            res.sendStatus(403)
+          } else {
+            jwtPayload.userid
+
+            //DELETE ACCESS TOKEN HAPPENS ON SERVER
+
+            if (req.cookies?.refresh_token) {
+              let decoded
+              try {
+                decoded = JWT.verify(
+                  req.cookies.refresh_token,
+                  serverConfigs.jwtSecret
+                )
+                if (!decoded) throw new Error(`Couldn't decode payload`)
+              } catch (e) {
+                res.sendStatus(401)
+                return
+              }
+
+              await this.serverConfigs.tokenDeletedCallback(
+                jwtPayload,
+                decoded.token
+              )
+
+              res.setHeader(
+                'Set-Cookie',
+                cookie.serialize('refresh_token', 'deleted', {
+                  httpOnly: true,
+                  expires: new Date(),
+                  maxAge: 0,
+                })
+              )
+              res.sendStatus(200)
+            } else res.sendStatus(403)
+
+            req.user = jwtPayload
+          }
+        }
+      )(req, res, next)
+    }
   }
 
   loginMiddleWare = (req: Request, res: Response, next: NextFunction) => {}
@@ -207,4 +258,6 @@ export class Authpal<T extends AuthpalJWTPayload = AuthpalJWTPayload> {
     res: Response,
     next: NextFunction
   ) => {}
+
+  logoutMiddleware = (req: Request, res: Response, next: NextFunction) => {}
 }

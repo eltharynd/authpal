@@ -30,6 +30,10 @@ export interface AuthpalConfigs<
     jwtPayload: TT,
     token: RefreshToken
   ): Promise<void> | void
+  tokenDeletedCallback(
+    jwtPayload: TT,
+    token: RefreshToken
+  ): Promise<void> | void
 }
 
 export const DEFAULT_EXPIRATION_TIME: number = 14 * 24 * 60 * 60 * 1000
