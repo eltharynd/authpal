@@ -10,6 +10,7 @@ export interface AuthpalClientConfigs {
 
   loginPostURL: string
   resumeGetURL: string
+  logoutGetURL: string
 }
 
 export class LibraryMisusageError extends Error {}

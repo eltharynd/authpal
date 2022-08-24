@@ -381,6 +381,9 @@ let authpalClient = new AuthpalClient({
   loginPostUrl: 'https://example.com/api/v1/login',
   //The GET endpoint for resuming the session in on your server
   loginPostUrl: 'https://example.com/api/v1/login',
+  //The GET endpoint for logging out on your server
+  //If you don't call this the session will not be closed, hence resumed on page refresh
+  logoutGetURL: 'https://example.com/api/v1/logout',
 
   //The custom subject that emits changes to the user (As defined above)
   userChangesEmitter: userChangesEmitter,

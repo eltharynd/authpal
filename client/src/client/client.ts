@@ -107,10 +107,18 @@ export class AuthpalClient {
   }
 
   async logout() {
-    //TODO remove token from server?
-    this.clientConfigs.userChangesEmitter.next({
-      type: 'logout',
-      authenticated: false,
+    axios({
+      method: 'get',
+      url: `${this.clientConfigs.logoutGetURL}`,
+      headers: {
+        'Access-Control-Expose-Headers': 'Set-Cookie',
+      },
+      withCredentials: true,
+    }).then(() => {
+      this.clientConfigs.userChangesEmitter.next({
+        type: 'logout',
+        authenticated: false,
+      })
     })
   }
 }
