@@ -133,6 +133,8 @@ export class Authpal<T extends AuthpalJWTPayload = AuthpalJWTPayload> {
             'Set-Cookie',
             cookie.serialize('refresh_token', 'deleted', {
               httpOnly: true,
+              sameSite: 'none',
+              secure: true,
               expires: new Date(),
               maxAge: 0,
             })
@@ -159,7 +161,6 @@ export class Authpal<T extends AuthpalJWTPayload = AuthpalJWTPayload> {
             ),
           }
           await serverConfigs.tokenRefreshedCallback(jwtPayload, refreshToken)
-          //res.setHeader('Access-Control-Expose-Headers', 'Set-Cookie')
           res.setHeader(
             'Set-Cookie',
             cookie.serialize(
@@ -170,6 +171,8 @@ export class Authpal<T extends AuthpalJWTPayload = AuthpalJWTPayload> {
               ),
               {
                 httpOnly: true,
+                sameSite: 'none',
+                secure: true,
                 expires: refreshToken.expiration,
                 maxAge:
                   serverConfigs.refreshTokenExpiration ||
@@ -186,6 +189,8 @@ export class Authpal<T extends AuthpalJWTPayload = AuthpalJWTPayload> {
             'Set-Cookie',
             cookie.serialize('refresh_token', 'deleted', {
               httpOnly: true,
+              sameSite: 'none',
+              secure: true,
               expires: new Date(),
               maxAge: 0,
             })
