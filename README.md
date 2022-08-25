@@ -41,6 +41,23 @@ Setup your project following [3️⃣](#3️⃣-setup) then [4️⃣](#4️⃣-c
 
 </br>
 
+**Prerequisites:**
+
+Your express app should use the following
+
+```typescript
+import * as bodyParser from 'body-parser'
+import * as cookieParser from 'cookie-parser'
+
+//...
+
+app.use(bodyParser.json())
+app.use(cookieParser())
+```
+
+</br>
+</br>
+
 Install the package:
 
 ```bash
