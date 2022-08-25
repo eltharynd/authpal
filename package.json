@@ -7,7 +7,9 @@
   "scripts": {
     "prepare": "rm -rf lib && tsc",
     "deploy": "npm publish",
-    "test": "ts-node node_modules/jasmine/bin/jasmine --reporter=jasmine-ts-console-reporter --config=jasmine.json"
+    "test": "npm run test-server && npm run test-client",
+    "test-server": "ts-node node_modules/jasmine/bin/jasmine --reporter=jasmine-ts-console-reporter --config=jasmine.server.json",
+    "test-client": "ts-node node_modules/jasmine/bin/jasmine --reporter=jasmine-ts-console-reporter --config=jasmine.client.json"
   },
   "files": [
     "lib/**/*.js",
