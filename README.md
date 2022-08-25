@@ -53,6 +53,11 @@ import * as cookieParser from 'cookie-parser'
 
 app.use(bodyParser.json())
 app.use(cookieParser())
+
+/*
+  cors should also be set.
+  those are required by secure httpOnly cookies by browsers
+*/
 ```
 
 </br>

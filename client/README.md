@@ -41,6 +41,28 @@ Setup your project following [3️⃣](#3️⃣-setup) then [4️⃣](#4️⃣-c
 
 </br>
 
+**Prerequisites:**
+
+Your express app should use the following
+
+```typescript
+import * as bodyParser from 'body-parser'
+import * as cookieParser from 'cookie-parser'
+
+//...
+
+app.use(bodyParser.json())
+app.use(cookieParser())
+
+/*
+  cors should also be set.
+  those are required by secure httpOnly cookies by browsers
+*/
+```
+
+</br>
+</br>
+
 Install the package:
 
 ```bash
@@ -426,5 +448,4 @@ let authpalClient = new AuthpalClient({
 [c-npm-url]: https://npmjs.org/package/authpal-client
 [c-npm-install-size-image]: https://badgen.net/packagephobia/install/authpal-client
 [c-npm-install-size-url]: https://packagephobia.com/result?p=authpal-client
-[c-npm-downloads-image]: https://badgen.net/npm/dm/authpal-client
-[c-npm-downloads-url]: https://npmcharts.com/compare/authpal-client?minimal=true
+[c-npm-downloads-image]: https://badgen.net/npm/dm
