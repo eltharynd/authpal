@@ -56,7 +56,7 @@ app.use(cookieParser())
 
 /*
   cors should also be set.
-  those are required by secure httpOnly cookies by browsers
+  those are required for secure httpOnly cookies by browsers
 */
 ```
 
