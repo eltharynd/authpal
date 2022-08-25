@@ -9,7 +9,7 @@
     "deploy": "npm publish",
     "test": "npm run test-server && npm run test-client",
     "test-server": "ts-node node_modules/jasmine/bin/jasmine --reporter=jasmine-ts-console-reporter --config=jasmine.server.json",
-    "test-client": "ts-node node_modules/jasmine/bin/jasmine --reporter=jasmine-ts-console-reporter --config=jasmine.client.json"
+    "test-client": "ts-node node_modules/jasmine/bin/jasmine --reporter=jasmine-ts-console-reporter --config=client/jasmine.client.json"
   },
   "files": [
     "lib/**/*.js",
