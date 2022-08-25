@@ -22,6 +22,8 @@ describe('Server', () => {
       let user: AuthpalJWTPayload = req.user
       res.sendStatus(200)
     })
+
+    app.get('/logout', authpal.logoutMiddleware)
   })
 
   it('should be initialized', () => {
@@ -42,7 +44,7 @@ describe('Server', () => {
         if (err) return done.fail(err)
 
         let cookie = res.headers['set-cookie'][0]
-        expect(/^refresh_token=.*; .*; HttpOnly$/.test(cookie)).toBeTrue()
+        expect(/^refresh_token=.*;.*HttpOnly.*$/.test(cookie)).toBeTrue()
         expect(res.body.accessToken).toBeDefined()
         done()
       })
@@ -125,6 +127,32 @@ describe('Server', () => {
           .get('/resume')
           .set('Cookie', `${refreshToken.replace(/token=.{3}/, 'token=124')}`)
           .expect(401)
+          .end((e, r) => {
+            if (e) return done.fail(e)
+            done()
+          })
+      })
+  })
+
+  it('should logout user', (done) => {
+    request(app)
+      .post('/login')
+      .send({ username: 'eltharynd', password: 'asupersecurepassword' })
+      .expect(200)
+      .end((err, res) => {
+        if (err) return done.fail(err)
+
+        let accessToken = res.body.accessToken
+        let refreshToken = res.headers['set-cookie'][0]
+        global.resume = refreshToken
+          .replace(/^refresh_token=/, '')
+          .replace(/; .*$/, '')
+
+        request(app)
+          .get('/logout')
+          .set('Cookie', `${refreshToken}`)
+          .set('Authorization', `Bearer ${accessToken}`)
+          .expect(200)
           .end((e, r) => {
             if (e) return done.fail(e)
             done()

@@ -46,6 +46,9 @@ beforeAll((done) => {
       tokenRefreshedCallback: async (jwtPayload, token) => {
         global.user.token = token
       },
+      tokenDeletedCallback: async (jwtPayload, token) => {
+        global.user.token = null
+      },
     }
     global.authpalConfigs = authpalConfigs
     global.authpal = new Authpal(authpalConfigs)
