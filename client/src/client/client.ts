@@ -1,4 +1,8 @@
-import { AuthpalClientConfigs, LibraryMisusageError } from './interfaces'
+import {
+  AuthpalClientConfigs,
+  LibraryMisusageError,
+  UserChangesEmitter,
+} from './interfaces'
 import axios from 'axios'
 
 export class AuthpalClient {
@@ -7,6 +11,8 @@ export class AuthpalClient {
 
   constructor(clientConfigs: AuthpalClientConfigs) {
     this.clientConfigs = clientConfigs
+    if (!this.clientConfigs.userChangesEmitter)
+      this.clientConfigs.userChangesEmitter = new UserChangesEmitter()
     this.clientConfigs.userChangesEmitter.subscribe((changes) => {
       if (!changes.authenticated) {
         this.accessToken = null
@@ -112,7 +118,7 @@ export class AuthpalClient {
       url: `${this.clientConfigs.logoutGetURL}`,
       headers: {
         'Access-Control-Expose-Headers': 'Set-Cookie',
-        Authorization: `Bearer ${this.accessToken}`,
+        ...this.getAuthorizationHeader(),
       },
       withCredentials: true,
     }).then(() => {
