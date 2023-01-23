@@ -72,29 +72,28 @@ export class Authpal<T extends AuthpalJWTPayload = AuthpalJWTPayload> {
     this.loginMiddleWare = (
       req: Request,
       res: Response,
-      next: NextFunction,
-      errorCallback?: Function
+      next: NextFunction
     ) => {
       passport.authenticate('login', async function (err, jwtPayload: T) {
         if (err) {
-          if (errorCallback)
+          if (next)
             try {
-              errorCallback(err)
+              next(err)
             } catch (e) {}
           return next(err)
         }
         if (!jwtPayload) {
-          if (errorCallback)
+          if (next)
             try {
-              errorCallback(new Error('No JWT payload'))
+              next(new Error('No JWT payload'))
             } catch (e) {}
           return res.sendStatus(401)
         }
         req.login(jwtPayload, { session: false }, async function (error) {
           if (error) {
-            if (errorCallback)
+            if (next)
               try {
-                errorCallback(error)
+                next(error)
               } catch (e) {}
             return next(error)
           }
@@ -290,12 +289,7 @@ export class Authpal<T extends AuthpalJWTPayload = AuthpalJWTPayload> {
     }
   }
 
-  loginMiddleWare = (
-    req: Request,
-    res: Response,
-    next: NextFunction,
-    errorCallback?: Function
-  ) => {}
+  loginMiddleWare = (req: Request, res: Response, next: NextFunction) => {}
 
   resumeMiddleware = async (
     req: Request,
