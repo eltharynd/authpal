@@ -1,16 +1,25 @@
-import { Request, Response, NextFunction } from 'express'
-import * as passport from 'passport'
-import { Strategy as LocalStrategy } from 'passport-local'
-import { Strategy as JWTStrategy, ExtractJwt } from 'passport-jwt'
-import * as JWT from 'jsonwebtoken'
-import { v4 } from 'uuid'
 import * as cookie from 'cookie'
+import { NextFunction, Request, Response } from 'express'
+import * as JWT from 'jsonwebtoken'
+import * as passport from 'passport'
+import { ExtractJwt, Strategy as JWTStrategy } from 'passport-jwt'
+import { Strategy as LocalStrategy } from 'passport-local'
+import { v4 } from 'uuid'
 
 import {
-  AuthpalJWTPayload,
   AuthpalConfigs,
+  AuthpalJWTPayload,
   DEFAULT_EXPIRATION_TIME,
 } from './interfaces'
+
+declare global {
+  namespace Express {
+    export interface Request {
+      //@ts-ignore
+      user?: { userid: string }
+    }
+  }
+}
 
 export class Authpal<T extends AuthpalJWTPayload = AuthpalJWTPayload> {
   private serverConfigs: AuthpalConfigs
@@ -75,28 +84,14 @@ export class Authpal<T extends AuthpalJWTPayload = AuthpalJWTPayload> {
       next: NextFunction
     ) => {
       passport.authenticate('login', async function (err, jwtPayload: T) {
-        if (err) {
-          if (next)
-            try {
-              next(err)
-            } catch (e) {}
-          return next(err)
-        }
+        if (err) return next(err)
+
         if (!jwtPayload) {
-          if (next)
-            try {
-              next(new Error('No JWT payload'))
-            } catch (e) {}
           return res.sendStatus(401)
         }
         req.login(jwtPayload, { session: false }, async function (error) {
-          if (error) {
-            if (next)
-              try {
-                next(error)
-              } catch (e) {}
-            return next(error)
-          }
+          if (error) return next(error)
+
           let accessToken = JWT.sign(jwtPayload, serverConfigs.jwtSecret)
           let refreshToken = {
             token: v4(),
