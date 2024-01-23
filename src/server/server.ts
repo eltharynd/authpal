@@ -93,8 +93,23 @@ export class Authpal<T extends AuthpalJWTPayload = AuthpalJWTPayload> {
           if (error) return next(error)
 
           let accessToken = JWT.sign(jwtPayload, serverConfigs.jwtSecret)
+
+          let oldToken
+          try {
+            let resumePayload: any = JWT.verify(
+              req.cookies.refresh_token,
+              serverConfigs.jwtSecret
+            )
+            if (
+              resumePayload.token &&
+              resumePayload.userid === jwtPayload.userid
+            )
+              oldToken = resumePayload.token
+          } catch (e) {
+            console.info('Invalid resume JWT Payload sent...')
+          }
           let refreshToken = {
-            token: v4(),
+            token: oldToken || v4(),
             expiration: new Date(
               Date.now() +
                 (serverConfigs.refreshTokenExpiration ||
