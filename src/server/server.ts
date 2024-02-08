@@ -243,8 +243,10 @@ export class Authpal<T extends AuthpalJWTPayload = AuthpalJWTPayload> {
       })(req, res, next)
     }
 
-    this.verifyAuthToken = async (authToken) => {
-      return new Promise<void>((resolve, reject) => {
+    this.verifyAuthToken = async (
+      authToken
+    ): Promise<{ userid: string } | null> => {
+      return new Promise<{ userid: string } | null>((resolve, reject) => {
         passport.authenticate('jwt', { session: false }, (err, jwtPayload) => {
           if (err || !jwtPayload) {
             reject()
@@ -323,7 +325,9 @@ export class Authpal<T extends AuthpalJWTPayload = AuthpalJWTPayload> {
     next: NextFunction
   ) => {}
 
-  verifyAuthToken = async (authToken: string) => {}
+  verifyAuthToken = async (
+    authToken: string
+  ): Promise<{ userid: string } | null> => null
 
   logoutMiddleware = (req: Request, res: Response, next: NextFunction) => {}
 }
