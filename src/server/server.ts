@@ -105,9 +105,7 @@ export class Authpal<T extends AuthpalJWTPayload = AuthpalJWTPayload> {
               resumePayload.userid === jwtPayload.userid
             )
               oldToken = resumePayload.token
-          } catch (e) {
-            console.info('Invalid resume JWT Payload sent...')
-          }
+          } catch {}
           let refreshToken = {
             token: oldToken || v4(),
             expiration: new Date(
@@ -245,6 +243,18 @@ export class Authpal<T extends AuthpalJWTPayload = AuthpalJWTPayload> {
       })(req, res, next)
     }
 
+    this.verifyAuthToken = async (authToken) => {
+      return new Promise<void>((resolve, reject) => {
+        passport.authenticate('jwt', { session: false }, (err, jwtPayload) => {
+          if (err || !jwtPayload) {
+            reject()
+          } else {
+            resolve(jwtPayload)
+          }
+        })({ headers: { authorization: authToken } }, null, reject)
+      })
+    }
+
     this.logoutMiddleware = async (
       req: Request,
       res: Response,
@@ -312,6 +322,8 @@ export class Authpal<T extends AuthpalJWTPayload = AuthpalJWTPayload> {
     res: Response,
     next: NextFunction
   ) => {}
+
+  verifyAuthToken = async (authToken: string) => {}
 
   logoutMiddleware = (req: Request, res: Response, next: NextFunction) => {}
 }
