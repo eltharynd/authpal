@@ -78,16 +78,17 @@ export class Authpal<T extends AuthpalJWTPayload = AuthpalJWTPayload> {
 
   private prepareMiddlewares() {
     let serverConfigs = this.serverConfigs
-    this.loginMiddleWare = (
+    this.loginMiddleWare = async (
       req: Request,
       res: Response,
-      next: NextFunction
+      next: NextFunction,
+      errorHandler?: (httpCode: number) => void
     ) => {
       passport.authenticate('login', async function (err, jwtPayload: T) {
         if (err) return next(err)
 
         if (!jwtPayload) {
-          return res.sendStatus(401)
+          return errorHandler ? errorHandler(401) : res.sendStatus(401)
         }
         req.login(jwtPayload, { session: false }, async function (error) {
           if (error) return next(error)
@@ -146,7 +147,8 @@ export class Authpal<T extends AuthpalJWTPayload = AuthpalJWTPayload> {
     this.resumeMiddleware = async (
       req: Request,
       res: Response,
-      next: NextFunction
+      next: NextFunction,
+      errorHandler?: (httpCode: number) => void
     ) => {
       if (req.cookies?.refresh_token) {
         let decoded
@@ -167,8 +169,7 @@ export class Authpal<T extends AuthpalJWTPayload = AuthpalJWTPayload> {
               maxAge: 0,
             })
           )
-          res.sendStatus(401)
-          return
+          return errorHandler ? errorHandler(401) : res.sendStatus(401)
         }
 
         let jwtPayload = await serverConfigs.findUserByRefreshToken(
@@ -208,10 +209,9 @@ export class Authpal<T extends AuthpalJWTPayload = AuthpalJWTPayload> {
               }
             )
           )
-          res.json({
+          return res.json({
             accessToken: accessToken,
           })
-          return
         } else {
           res.setHeader(
             'Set-Cookie',
@@ -225,17 +225,18 @@ export class Authpal<T extends AuthpalJWTPayload = AuthpalJWTPayload> {
           )
         }
       }
-      res.sendStatus(401)
+      return errorHandler ? errorHandler(401) : res.sendStatus(401)
     }
 
-    this.authorizationMiddleware = (
+    this.authorizationMiddleware = async (
       req: Request,
       res: Response,
-      next: NextFunction
+      next: NextFunction,
+      errorHandler?: (httpCode: number) => void
     ) => {
       passport.authenticate('jwt', { session: false }, (err, jwtPayload) => {
         if (err || !jwtPayload) {
-          res.sendStatus(403)
+          return errorHandler ? errorHandler(401) : res.sendStatus(403)
         } else {
           req.user = jwtPayload
           next()
@@ -260,7 +261,8 @@ export class Authpal<T extends AuthpalJWTPayload = AuthpalJWTPayload> {
     this.logoutMiddleware = async (
       req: Request,
       res: Response,
-      next: NextFunction
+      next: NextFunction,
+      errorHandler?: (httpCode: number) => void
     ) => {
       passport.authenticate(
         'jwt',
@@ -311,23 +313,33 @@ export class Authpal<T extends AuthpalJWTPayload = AuthpalJWTPayload> {
     }
   }
 
-  loginMiddleWare = (req: Request, res: Response, next: NextFunction) => {}
-
-  resumeMiddleware = async (
+  loginMiddleWare: (
     req: Request,
     res: Response,
-    next: NextFunction
-  ) => {}
+    next: NextFunction,
+    errorHandler?: (httpCode: number) => void
+  ) => Promise<any>
 
-  authorizationMiddleware = (
+  resumeMiddleware: (
     req: Request,
     res: Response,
-    next: NextFunction
-  ) => {}
+    next: NextFunction,
+    errorHandler?: (httpCode: number) => void
+  ) => Promise<any>
 
-  verifyAuthToken = async (
-    authToken: string
-  ): Promise<{ userid: string } | null> => null
+  authorizationMiddleware: (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+    errorHandler?: (httpCode: number) => void
+  ) => Promise<any>
 
-  logoutMiddleware = (req: Request, res: Response, next: NextFunction) => {}
+  verifyAuthToken: (authToken: string) => Promise<{ userid: string } | null>
+
+  logoutMiddleware: (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+    errorHandler?: (httpCode: number) => void
+  ) => Promise<any>
 }

@@ -6,7 +6,7 @@
   "types": "lib/index.d.ts",
   "scripts": {
     "prepare": "rm -rf lib && tsc",
-    "deploy": "npm publish",
+    "deploy": "npm version patch && npm publish",
     "test": "npm run test-server && npm run test-client",
     "test-server": "ts-node node_modules/jasmine/bin/jasmine --reporter=jasmine-ts-console-reporter --config=jasmine.server.json",
     "test-client": "ts-node node_modules/jasmine/bin/jasmine --reporter=jasmine-ts-console-reporter --config=client/jasmine.client.json"
