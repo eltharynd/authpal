@@ -1,9 +1,9 @@
+import axios from 'axios'
 import {
   AuthpalClientConfigs,
   LibraryMisusageError,
   UserChangesEmitter,
 } from './interfaces'
-import axios from 'axios'
 
 export class AuthpalClient {
   private accessToken: string

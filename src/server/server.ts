@@ -268,7 +268,6 @@ export class Authpal<T extends AuthpalJWTPayload = AuthpalJWTPayload> {
         'jwt',
         { session: false },
         async (err, jwtPayload) => {
-          if (err) throw err
           if (err || !jwtPayload) {
             return errorHandler ? errorHandler(403) : res.sendStatus(403)
           } else {
