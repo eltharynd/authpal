@@ -236,7 +236,7 @@ export class Authpal<T extends AuthpalJWTPayload = AuthpalJWTPayload> {
     ) => {
       passport.authenticate('jwt', { session: false }, (err, jwtPayload) => {
         if (err || !jwtPayload) {
-          return errorHandler ? errorHandler(401) : res.sendStatus(403)
+          return errorHandler ? errorHandler(403) : res.sendStatus(403)
         } else {
           req.user = jwtPayload
           next()
@@ -268,8 +268,9 @@ export class Authpal<T extends AuthpalJWTPayload = AuthpalJWTPayload> {
         'jwt',
         { session: false },
         async (err, jwtPayload) => {
+          if (err) throw err
           if (err || !jwtPayload) {
-            res.sendStatus(403)
+            return errorHandler ? errorHandler(403) : res.sendStatus(403)
           } else {
             jwtPayload.userid
 
@@ -284,8 +285,7 @@ export class Authpal<T extends AuthpalJWTPayload = AuthpalJWTPayload> {
                 )
                 if (!decoded) throw new Error(`Couldn't decode payload`)
               } catch (e) {
-                res.sendStatus(401)
-                return
+                return errorHandler ? errorHandler(401) : res.sendStatus(401)
               }
 
               await this.serverConfigs.tokenDeletedCallback(
@@ -304,7 +304,7 @@ export class Authpal<T extends AuthpalJWTPayload = AuthpalJWTPayload> {
                 })
               )
               res.sendStatus(200)
-            } else res.sendStatus(403)
+            } else return errorHandler ? errorHandler(403) : res.sendStatus(403)
 
             req.user = jwtPayload
           }
