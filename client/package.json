@@ -1,6 +1,6 @@
 {
   "name": "authpal-client",
-  "version": "1.5.9",
+  "version": "1.5.8",
   "description": "An authentication and authorization library for express applications and clients",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
