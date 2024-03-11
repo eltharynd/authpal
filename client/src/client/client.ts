@@ -23,6 +23,34 @@ export class AuthpalClient {
     })
   }
 
+  async google(credentials: { [key: string]: string }): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      axios({
+        method: 'post',
+        url: `${this.clientConfigs.googlePostUrl}`,
+        withCredentials: true,
+        data: credentials,
+      })
+        .then(async ({ data }) => {
+          this.accessToken = data.accessToken
+          this.clientConfigs.userChangesEmitter.next({
+            type: 'login',
+            authenticated: true,
+          })
+          resolve()
+        })
+        .catch((error) => {
+          if (error?.response?.status === 401) {
+            this.clientConfigs.userChangesEmitter.next({
+              type: 'login',
+              authenticated: false,
+            })
+            reject(error)
+          } else reject(error)
+        })
+    })
+  }
+
   async login(credentials: { [key: string]: string }): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       axios({

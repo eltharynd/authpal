@@ -8,6 +8,7 @@ export interface AuthpalClientConfigs {
   resumeDoneEmitter: Subject<void>
   resumeDoneMiddleware?(changes?: UserChangesEvent): Promise<void>
 
+  googlePostUrl: string
   loginPostURL: string
   resumeGetURL: string
   logoutGetURL: string
