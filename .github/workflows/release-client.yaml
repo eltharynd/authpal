@@ -24,6 +24,9 @@ jobs:
     permissions:
       contents: write
       id-token: write
+    defaults:
+      run:
+        working-directory: client
 
     steps:
       - name: Checkout
@@ -68,7 +71,7 @@ jobs:
           script: |
             const fs = require('fs');
 
-            const path = 'package.json';
+            const path = 'client/package.json';
             const contents = fs.readFileSync(path, 'utf8');
             const version = '${{ steps.version.outputs.version }}';
 
