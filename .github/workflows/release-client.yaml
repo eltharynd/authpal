@@ -9,7 +9,8 @@ on:
       - 'client/src/**'
       - 'package.json'
       - 'client/package.json'
-      - '.github/workflows/release.yaml'
+      - '.github/workflows/release-server.yaml'
+      - '.github/workflows/release-client.yaml'
   workflow_dispatch:
     inputs:
       version:
