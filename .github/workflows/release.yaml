@@ -10,8 +10,6 @@ on:
       - 'package.json'
       - 'client/package.json'
       - '.github/workflows/release.yaml'
-
-
   workflow_dispatch:
     inputs:
       version:
@@ -41,6 +39,9 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Ensure npm supports trusted publishing
+        run: npm install -g npm@latest
 
       - name: Run tests
         run: npm test --if-present
@@ -110,8 +111,6 @@ jobs:
 
       - name: Publish to npm
         run: npm publish --access public --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v3
