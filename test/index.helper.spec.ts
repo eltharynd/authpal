@@ -1,8 +1,8 @@
-import * as express from 'express'
 import * as bodyParser from 'body-parser'
 import * as cookieParser from 'cookie-parser'
+import * as express from 'express'
 
-import { Authpal, AuthpalJWTPayload, AuthpalConfigs } from '../src/index'
+import { Authpal, AuthpalConfigs, AuthpalJWTPayload } from '../src/index.js'
 //import { createServer } from 'http'
 
 beforeAll((done) => {

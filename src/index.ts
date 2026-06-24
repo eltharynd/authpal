@@ -1,2 +1,2 @@
-export * from './server/server'
-export * from './server/interfaces'
+export * from './server/interfaces.js'
+export * from './server/server.js'

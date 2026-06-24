@@ -1,9 +1,9 @@
 import * as express from 'express'
-import * as request from 'supertest'
 import * as finishTestcase from 'jasmine-supertest'
 import * as JWT from 'jsonwebtoken'
+import * as request from 'supertest'
 
-import { Authpal, AuthpalJWTPayload } from '../../src'
+import { Authpal, AuthpalJWTPayload } from '../../src/index.js'
 
 describe('Server', () => {
   let app: express.Application
@@ -93,7 +93,7 @@ describe('Server', () => {
 
         let decoded = JWT.verify(
           refreshToken.replace(/^refresh_token=/, '').replace(/; .*$/, ''),
-          global.authpalConfigs.jwtSecret
+          global.authpalConfigs.jwtSecret,
         )
 
         //@ts-ignore

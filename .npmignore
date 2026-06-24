@@ -3,6 +3,7 @@
 **/.gitignore
 .prettierrc
 **/jasmine.json
+**/vitest.config.ts
 **/tsconfig.json
 **/src
 **/test

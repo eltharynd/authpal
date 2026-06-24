@@ -2,10 +2,13 @@
   "include": ["src/**/*.ts"],
   "compilerOptions": {
     "declaration": true,
-    "module": "commonjs",
+    "module": "preserve",
+    "moduleResolution": "bundler",
+    "noImplicitAny": false,
     "outDir": "lib",
     "resolveJsonModule": true,
     "rootDir": "src",
+    "strictPropertyInitialization": false,
     "target": "es2015"
   }
 }
